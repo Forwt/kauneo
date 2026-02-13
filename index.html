@@ -1,0 +1,1029 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <title>Kauneon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --glass: rgba(15, 23, 42, 0.85);
+      --glass-border: rgba(148, 163, 184, 0.45);
+      --glass-dark: rgba(15, 23, 42, 0.9);
+      --did: #16a34a; /* 墨绿色主色 */
+      --did-soft: rgba(22, 163, 74, 0.24);
+      --skip: #6b7280;
+      --skip-soft: rgba(55, 65, 81, 0.4);
+      --text: #e5e7eb;
+      --text-secondary: #9ca3af;
+      --shadow: 0 18px 60px rgba(0, 0, 0, 0.85);
+      --radius: 16px;
+      --radius-lg: 22px;
+      --safe-top: env(safe-area-inset-top);
+      --safe-bottom: env(safe-area-inset-bottom);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(22, 163, 74, 0.22) 0, transparent 55%),
+        radial-gradient(circle at bottom, rgba(22, 163, 74, 0.18) 0, transparent 55%),
+        #020617;
+      min-height: 100vh;
+      min-height: 100dvh;
+      color: var(--text);
+      padding: calc(var(--safe-top) + 20px) 20px calc(var(--safe-bottom) + 20px);
+    }
+
+    .container {
+      max-width: 420px;
+      margin: 0 auto;
+    }
+
+    .app-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: #f9fafb;
+      margin-bottom: 16px;
+      padding-left: 4px;
+      text-shadow: 0 14px 40px rgba(0, 0, 0, 0.7);
+    }
+
+    /* 顶部统计 - 毛玻璃 */
+    .stats-card {
+      background: var(--glass);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .stats-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 16px;
+    }
+
+    .stat {
+      text-align: center;
+      flex: 1;
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+    }
+
+    .stat-value.did { color: var(--did); }
+    .stat-value.skip { color: var(--skip); }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    .stat-period {
+      font-size: 11px;
+      color: var(--text-secondary);
+      opacity: 0.9;
+      margin-top: 2px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+    }
+
+    .stats-grid .stat-value {
+      font-size: 22px;
+    }
+
+    /* 两个大按钮 - 丝滑鼠标交互动画 */
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    .btn-main {
+      position: relative;
+      min-height: 120px;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 20px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  box-shadow 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                  border-color 0.3s ease,
+                  background 0.3s ease;
+      background: var(--glass);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      -webkit-tap-highlight-color: transparent;
+      overflow: hidden;
+    }
+
+    .btn-main::before {
+      content: '';
+      position: absolute;
+      left: var(--mx, 50%);
+      top: var(--my, 50%);
+      width: 160px;
+      height: 160px;
+      background: radial-gradient(circle, rgba(74, 222, 128, 0.55) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .btn-main:hover {
+      transform: scale(1.02);
+    }
+
+    .btn-main:hover::before {
+      opacity: 1;
+    }
+
+    .btn-main:active {
+      transform: scale(0.98);
+      transition-duration: 0.1s;
+    }
+
+    .btn-main .icon {
+      font-size: 36px;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-main span:last-of-type {
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-main.did {
+      color: #ecfdf5;
+      background:
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.35), transparent 55%),
+        linear-gradient(135deg, #16a34a, #22c55e);
+      border-color: rgba(34, 197, 94, 0.8);
+      box-shadow: 0 20px 50px rgba(22, 163, 74, 0.65);
+    }
+
+    .btn-main.did:hover {
+      box-shadow: 0 26px 70px rgba(22, 163, 74, 0.9);
+      border-color: rgba(34, 197, 94, 1);
+    }
+
+    .btn-main.skip {
+      color: #e5e7eb;
+      background:
+        radial-gradient(circle at top left, rgba(148, 163, 184, 0.35), transparent 55%),
+        linear-gradient(135deg, #111827, #020617);
+      border-color: rgba(75, 85, 99, 0.8);
+      box-shadow: 0 18px 55px rgba(15, 23, 42, 0.9);
+    }
+
+    .btn-main.skip:hover {
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 1);
+      border-color: rgba(148, 163, 184, 1);
+    }
+
+    /* 历史记录区 */
+    .section-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+      padding-left: 4px;
+    }
+
+    .history-list {
+      background: var(--glass);
+      backdrop-filter: saturate(180%) blur(26px);
+      -webkit-backdrop-filter: saturate(180%) blur(26px);
+      border: 1px solid var(--glass-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+      cursor: pointer;
+      transition: background 0.3s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .history-item:last-child {
+      border-bottom: none;
+    }
+
+    .history-item:hover,
+    .history-item:active {
+      background: var(--glass-dark);
+    }
+
+    .history-item.expanded {
+      background: var(--glass-dark);
+    }
+
+    .history-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .history-type {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .history-type.did { color: var(--did); }
+    .history-type.skip { color: var(--skip); }
+
+    .history-time {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .history-detail {
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid rgba(0, 0, 0, 0.06);
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .history-detail span {
+      display: inline-block;
+      margin-right: 12px;
+      margin-bottom: 4px;
+    }
+
+    .history-delete {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid var(--glass-border);
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      color: var(--text-secondary);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .history-delete:hover {
+      background: #ffecec;
+      color: #ff3b30;
+      box-shadow: 0 4px 14px rgba(255, 59, 48, 0.35);
+    }
+
+    .history-delete:active {
+      transform: scale(0.9);
+    }
+
+    .history-empty {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text-secondary);
+      font-size: 15px;
+    }
+
+    /* 底部备份区 */
+    .backup-bar {
+      margin-top: 28px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-secondary {
+      padding: 12px 20px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      border: 1px solid var(--glass-border);
+      background: var(--glass);
+      backdrop-filter: saturate(180%) blur(20px);
+      -webkit-backdrop-filter: saturate(180%) blur(20px);
+      color: var(--text);
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+      -webkit-tap-highlight-color: transparent;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease;
+    }
+
+    .btn-secondary:hover {
+      transform: scale(1.03);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    }
+
+    .btn-secondary:active {
+      transform: scale(0.98);
+    }
+
+    .backup-tip {
+      margin-top: 16px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      padding: 0 16px;
+    }
+
+    /* 弹层 - 搭了 详情 */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s, visibility 0.25s;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #detailOverlay,
+    #skipOverlay {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    #detailBackdrop,
+    #skipBackdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+
+    .sheet {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: var(--glass);
+      backdrop-filter: saturate(180%) blur(40px);
+      -webkit-backdrop-filter: saturate(180%) blur(40px);
+      border: 1px solid var(--glass-border);
+      border-radius: 24px 24px 0 0;
+      padding: 24px 20px calc(var(--safe-bottom) + 24px);
+      z-index: 101;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.12);
+    }
+
+    .overlay.show .sheet {
+      transform: translateY(0);
+    }
+
+    .sheet-handle {
+      width: 36px;
+      height: 4px;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 2px;
+      margin: 0 auto 20px;
+    }
+
+    .sheet-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 20px;
+      text-align: center;
+      color: var(--did);
+    }
+
+    .field-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .option-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .option-btn {
+      flex: 1;
+      min-width: 90px;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 2px solid rgba(0, 0, 0, 0.08);
+      background: rgba(255, 255, 255, 0.6);
+      font-size: 15px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease, transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .option-btn:hover {
+      background: rgba(255, 255, 255, 0.9);
+      transform: scale(1.03);
+    }
+
+    .option-btn:active {
+      transform: scale(0.98);
+    }
+
+    .option-btn.selected {
+      border-color: var(--did);
+      background: var(--did-soft);
+      color: var(--did);
+    }
+
+    .option-btn.selected.wechat-no {
+      border-color: var(--skip);
+      background: var(--skip-soft);
+      color: var(--skip);
+    }
+
+    .rating-group {
+      margin-bottom: 20px;
+    }
+
+    .rating-slider {
+      width: 100%;
+      -webkit-appearance: none;
+      height: 6px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--did) 50%, rgba(55, 65, 81, 0.8) 50%);
+      outline: none;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+      transition: background 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .rating-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ffffff;
+      border: 2px solid var(--did);
+      box-shadow: 0 4px 14px rgba(34, 197, 94, 0.55);
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .rating-slider::-webkit-slider-thumb:active {
+      transform: scale(1.05);
+      box-shadow: 0 6px 16px rgba(52, 199, 89, 0.45);
+    }
+
+    .rating-value {
+      margin-top: 8px;
+      font-size: 14px;
+      color: var(--text-secondary);
+      text-align: right;
+    }
+
+    .rating-value span {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--did);
+      margin-right: 2px;
+    }
+
+    .note-input {
+      width: 100%;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      font-size: 15px;
+      font-family: inherit;
+      background: rgba(255, 255, 255, 0.8);
+      margin-bottom: 20px;
+    }
+
+    .note-input::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .note-input:focus {
+      outline: none;
+      border-color: var(--did);
+      box-shadow: 0 0 0 3px var(--did-soft);
+    }
+
+    .btn-save {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      border: none;
+      background: var(--did);
+      color: white;
+      font-size: 17px;
+      font-weight: 600;
+      font-family: inherit;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-save:active {
+      opacity: 0.9;
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: calc(80px + var(--safe-bottom));
+      transform: translateX(-50%) translateY(20px) scale(0.96);
+      background: rgba(15, 23, 42, 0.96);
+      color: #e5e7eb;
+      padding: 12px 24px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 500;
+      z-index: 200;
+      opacity: 0;
+      visibility: hidden;
+      box-shadow: 0 18px 55px rgba(0, 0, 0, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+    }
+
+    .toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+
+    /* 隐藏的导入 input */
+    .hidden-input {
+      position: absolute;
+      width: 0;
+      height: 0;
+      opacity: 0;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="app-title">Kauneon</h1>
+    <div class="stats-card">
+      <div class="stats-grid">
+        <div class="stat">
+          <div class="stat-value" id="statTodayRate">0%</div>
+          <div class="stat-label">今天搭讪率</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value did" id="statTodayCount">0</div>
+          <div class="stat-label">今天搭讪次数</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value" id="statSuccessRate">0%</div>
+          <div class="stat-label">成功率</div>
+        </div>
+        <div class="stat">
+          <div class="stat-value did" id="statMonthCount">0</div>
+          <div class="stat-label">本月搭讪次数</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button type="button" class="btn-main did" id="btnDid">
+        <span class="icon">✓</span>
+        <span>搭了</span>
+      </button>
+      <button type="button" class="btn-main skip" id="btnSkip">
+        <span class="icon">—</span>
+        <span>没搭</span>
+      </button>
+    </div>
+
+    <h2 class="section-title">记录</h2>
+    <div class="history-list" id="historyList">
+      <div class="history-empty" id="historyEmpty">暂无记录，点击上方按钮开始</div>
+    </div>
+
+    <div class="backup-bar">
+      <button type="button" class="btn-secondary" id="btnExport">导出备份</button>
+      <button type="button" class="btn-secondary" id="btnImport">从备份恢复</button>
+      <input type="file" class="hidden-input" id="importInput" accept=".json,application/json">
+    </div>
+    <p class="backup-tip">建议定期导出备份到相册或网盘，避免清理浏览器数据导致记录丢失</p>
+  </div>
+
+  <!-- 搭了 详情弹层 -->
+  <div class="overlay" id="detailOverlay">
+    <div class="overlay" id="detailBackdrop"></div>
+    <div class="sheet" id="detailSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">记录这次搭讪</div>
+      <form id="detailForm">
+        <label class="field-label">结果感觉</label>
+        <div class="option-row" id="resultOptions">
+          <button type="button" class="option-btn" data-value="good">不错</button>
+          <button type="button" class="option-btn" data-value="ok">一般</button>
+          <button type="button" class="option-btn" data-value="bad">不太好</button>
+        </div>
+        <label class="field-label">加微信</label>
+        <div class="option-row" id="wechatOptions">
+          <button type="button" class="option-btn" data-value="yes">加了</button>
+          <button type="button" class="option-btn wechat-no" data-value="no">没加</button>
+        </div>
+        <label class="field-label">对方颜值（0-10）</label>
+        <div class="rating-group">
+          <input type="range" class="rating-slider" id="detailRating" min="0" max="10" step="1" value="5">
+          <div class="rating-value"><span id="detailRatingValue">5</span> / 10</div>
+        </div>
+        <label class="field-label">备注（选填）</label>
+        <input type="text" class="note-input" id="detailNote" placeholder="可选" maxlength="100">
+        <button type="submit" class="btn-save" id="btnSaveDetail">保存</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- 没搭 颜值弹层 -->
+  <div class="overlay" id="skipOverlay">
+    <div class="overlay" id="skipBackdrop"></div>
+    <div class="sheet" id="skipSheet">
+      <div class="sheet-handle"></div>
+      <div class="sheet-title">记录这次没搭</div>
+      <form id="skipForm">
+        <label class="field-label">对方颜值（0-10）</label>
+        <div class="rating-group">
+          <input type="range" class="rating-slider" id="skipRating" min="0" max="10" step="1" value="5">
+          <div class="rating-value"><span id="skipRatingValue">5</span> / 10</div>
+        </div>
+        <button type="submit" class="btn-save">保存</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const STORAGE_KEY = 'habit_tracker_records';
+    let records = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    let detailResult = null;
+    let detailWechat = null;
+
+    const historyListEl = document.getElementById('historyList');
+    const historyEmptyEl = document.getElementById('historyEmpty');
+    const statTodayRateEl = document.getElementById('statTodayRate');
+    const statTodayCountEl = document.getElementById('statTodayCount');
+    const statSuccessRateEl = document.getElementById('statSuccessRate');
+    const statMonthCountEl = document.getElementById('statMonthCount');
+    const detailOverlay = document.getElementById('detailOverlay');
+    const detailBackdrop = document.getElementById('detailBackdrop');
+    const detailSheet = document.getElementById('detailSheet');
+    const detailForm = document.getElementById('detailForm');
+    const detailNote = document.getElementById('detailNote');
+    const detailRating = document.getElementById('detailRating');
+    const detailRatingValue = document.getElementById('detailRatingValue');
+    const resultOptions = document.getElementById('resultOptions');
+    const wechatOptions = document.getElementById('wechatOptions');
+    const skipOverlay = document.getElementById('skipOverlay');
+    const skipBackdrop = document.getElementById('skipBackdrop');
+    const skipForm = document.getElementById('skipForm');
+    const skipRating = document.getElementById('skipRating');
+    const skipRatingValue = document.getElementById('skipRatingValue');
+    const importInput = document.getElementById('importInput');
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
+    }
+
+    function showToast(msg) {
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => el.classList.remove('show'), 2000);
+    }
+
+    function isToday(iso) {
+      const d = new Date(iso);
+      const now = new Date();
+      return d.toDateString() === now.toDateString();
+    }
+
+    function isInMonth(iso) {
+      const d = new Date(iso);
+      const now = new Date();
+      return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+    }
+
+    function updateStats() {
+      const todayDid = records.filter(r => r.type === 'did' && isToday(r.time)).length;
+      const todaySkip = records.filter(r => r.type === 'skip' && isToday(r.time)).length;
+      const todayTotal = todayDid + todaySkip;
+      const todayRate = todayTotal > 0 ? Math.round((todayDid / todayTotal) * 100) : 0;
+
+      const allDid = records.filter(r => r.type === 'did');
+      const wechatYes = allDid.filter(r => r.wechat === 'yes').length;
+      const successRate = allDid.length > 0 ? Math.round((wechatYes / allDid.length) * 100) : 0;
+
+      const monthDid = records.filter(r => r.type === 'did' && isInMonth(r.time)).length;
+
+      statTodayRateEl.textContent = todayRate + '%';
+      statTodayCountEl.textContent = todayDid;
+      statSuccessRateEl.textContent = successRate + '%';
+      statMonthCountEl.textContent = monthDid;
+    }
+
+    function formatTime(iso) {
+      const d = new Date(iso);
+      const now = new Date();
+      const isToday = d.toDateString() === now.toDateString();
+      const time = d.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+      if (isToday) return '今天 ' + time;
+      const yesterday = new Date(now);
+      yesterday.setDate(yesterday.getDate() - 1);
+      if (d.toDateString() === yesterday.toDateString()) return '昨天 ' + time;
+      return d.toLocaleDateString('zh-CN') + ' ' + time;
+    }
+
+    const resultLabels = { good: '不错', ok: '一般', bad: '不太好' };
+    const wechatLabels = { yes: '加了', no: '没加' };
+
+    function setupRating(inputEl, valueEl) {
+      if (!inputEl || !valueEl) return;
+      const update = () => {
+        const v = Number(inputEl.value) || 0;
+        valueEl.textContent = v;
+        const percent = (v / 10) * 100;
+        inputEl.style.background = `linear-gradient(90deg, #16a34a ${percent}%, rgba(15, 23, 42, 0.9) ${percent}%)`;
+      };
+      inputEl.addEventListener('input', update);
+      update();
+    }
+
+    setupRating(detailRating, detailRatingValue);
+    setupRating(skipRating, skipRatingValue);
+
+    function renderHistory() {
+      if (records.length === 0) {
+        historyEmptyEl.style.display = 'block';
+        historyListEl.querySelectorAll('.history-item').forEach(el => el.remove());
+        return;
+      }
+      historyEmptyEl.style.display = 'none';
+      const items = records.slice().reverse();
+      historyListEl.innerHTML = items.map(r => {
+        if (r.type === 'skip') {
+          const ratingHtml = r.rating != null ? `<span class="history-time">颜值：${r.rating} / 10</span>` : '';
+          return `
+            <div class="history-item" data-id="${r.id}">
+              <div class="history-left">
+                <span class="history-type skip">没搭</span>
+                <span class="history-time">${formatTime(r.time)}</span>
+                ${ratingHtml}
+              </div>
+              <button type="button" class="history-delete" data-id="${r.id}">×</button>
+            </div>
+          `;
+        }
+        const detail = [
+          r.result ? '结果：' + resultLabels[r.result] : '',
+          r.wechat != null ? '微信：' + wechatLabels[r.wechat] : '',
+          r.rating != null ? '颜值：' + r.rating + ' / 10' : '',
+          r.note ? '备注：' + r.note : ''
+        ].filter(Boolean).join(' · ');
+        return `
+          <div class="history-item expandable" data-id="${r.id}">
+            <div class="history-left">
+              <span class="history-type did">搭了</span>
+              <span class="history-time">${formatTime(r.time)}</span>
+              ${detail ? `<div class="history-detail" style="display:none">${detail}</div>` : ''}
+            </div>
+            <button type="button" class="history-delete" data-id="${r.id}">×</button>
+          </div>
+        `;
+      }).join('');
+
+      historyListEl.querySelectorAll('.history-item.expandable').forEach(el => {
+        el.addEventListener('click', () => {
+          const detail = el.querySelector('.history-detail');
+          if (!detail) return;
+          detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
+          el.classList.toggle('expanded', detail.style.display === 'block');
+        });
+      });
+
+      historyListEl.querySelectorAll('.history-delete').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const id = btn.dataset.id;
+          records = records.filter(r => r.id !== id);
+          save();
+          updateStats();
+          renderHistory();
+          showToast('已删除一条记录');
+        });
+      });
+    }
+
+    function openDetailSheet() {
+      detailResult = null;
+      detailWechat = null;
+      detailNote.value = '';
+      if (detailRating) {
+        detailRating.value = 5;
+        detailRating.dispatchEvent(new Event('input'));
+      }
+      resultOptions.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      wechatOptions.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+      detailOverlay.classList.add('show');
+    }
+
+    function closeDetailSheet() {
+      detailOverlay.classList.remove('show');
+    }
+
+    function openSkipSheet() {
+      if (skipRating) {
+        skipRating.value = 5;
+        skipRating.dispatchEvent(new Event('input'));
+      }
+      skipOverlay.classList.add('show');
+    }
+
+    function closeSkipSheet() {
+      skipOverlay.classList.remove('show');
+    }
+
+    resultOptions.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        resultOptions.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        detailResult = btn.dataset.value;
+      });
+    });
+
+    wechatOptions.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        wechatOptions.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        detailWechat = btn.dataset.value;
+      });
+    });
+
+    detailForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const record = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+        type: 'did',
+        time: new Date().toISOString(),
+        result: detailResult || 'ok',
+        wechat: detailWechat != null ? detailWechat : 'no',
+        rating: detailRating ? Number(detailRating.value) : null,
+        note: detailNote.value.trim()
+      };
+      records.push(record);
+      save();
+      updateStats();
+      renderHistory();
+      closeDetailSheet();
+      showToast('已保存');
+    });
+
+    skipForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const record = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2),
+        type: 'skip',
+        time: new Date().toISOString(),
+        rating: skipRating ? Number(skipRating.value) : null
+      };
+      records.push(record);
+      save();
+      updateStats();
+      renderHistory();
+      closeSkipSheet();
+      showToast('已记录：没搭');
+    });
+
+    detailBackdrop.addEventListener('click', closeDetailSheet);
+    skipBackdrop.addEventListener('click', closeSkipSheet);
+
+    document.getElementById('btnDid').addEventListener('click', openDetailSheet);
+    document.getElementById('btnSkip').addEventListener('click', openSkipSheet);
+
+    document.getElementById('btnExport').addEventListener('click', () => {
+      const data = { version: 1, exportedAt: new Date().toISOString(), records };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'Kauneon备份_' + new Date().toISOString().slice(0, 10) + '.json';
+      a.click();
+      URL.revokeObjectURL(a.href);
+      showToast('已导出，请保存到相册或网盘');
+    });
+
+    document.getElementById('btnImport').addEventListener('click', () => importInput.click());
+
+    importInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          const list = data.records || (Array.isArray(data) ? data : []);
+          if (list.length === 0) {
+            showToast('备份里没有记录');
+            e.target.value = '';
+            return;
+          }
+          const existingIds = new Set(records.map(r => r.id));
+          let added = 0;
+          list.forEach(r => {
+            if (r.id && !existingIds.has(r.id)) {
+              records.push(r);
+              existingIds.add(r.id);
+              added++;
+            }
+          });
+          records.sort((a, b) => new Date(a.time) - new Date(b.time));
+          save();
+          updateStats();
+          renderHistory();
+          showToast('已恢复，新增 ' + added + ' 条记录');
+        } catch (err) {
+          showToast('文件格式错误，请选择正确的备份文件');
+        }
+        e.target.value = '';
+      };
+      reader.readAsText(file);
+    });
+
+    // 毛玻璃按钮：鼠标跟随光晕
+    document.querySelectorAll('.btn-main').forEach(btn => {
+      btn.addEventListener('mousemove', (e) => {
+        const rect = btn.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width) * 100;
+        const y = ((e.clientY - rect.top) / rect.height) * 100;
+        btn.style.setProperty('--mx', x + '%');
+        btn.style.setProperty('--my', y + '%');
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.removeProperty('--mx');
+        btn.style.removeProperty('--my');
+      });
+    });
+
+    updateStats();
+    renderHistory();
+  </script>
+</body>
+</html>
